@@ -5,7 +5,7 @@ description: "High performance, easy to learn, fast to code, ready for productio
 
 ## Basic setup
 
-First, create a new app in Apitally and select FastAPI as your framework.
+To get started, create a new app in Apitally and select FastAPI as your framework.
 
 Install the [Apitally Python client](https://pypi.org/project/apitally/) in your FastAPI project (e.g. using `pip` or `poetry`) with the `fastapi` extra.
 
@@ -57,11 +57,11 @@ app.add_middleware(
 
 If you have multiple environments for your application, provide the name of the current environment using the `env` argument (use alphanumeric characters and hyphens only).
 
-New environments will be visible in Apitally as soon as data is received from them. You can mark environments as production or non-production in the _Manage environments_ modal.
+New environments will be visible in Apitally as soon as data is received from them. You can mark environments as production or non-production on the _Manage environments_ screen.
 
 ## Using API key authentication
 
-First, to enable the synchronization of API key hashes from Apitally to your application, set the `enable_keys` argument to `True` when adding the middleware.
+Enable the synchronization of API key hashes from Apitally to your application by setting the `enable_keys` argument to `True` when adding the middleware.
 
 ```python
 app.add_middleware(
@@ -72,59 +72,71 @@ app.add_middleware(
 )
 ```
 
-<div className="-mt-3">
+<div className="-mt-4">
   <Info>
     The synchronization happens once at application startup and then every 60
     seconds.
   </Info>
 </div>
 
-To secure an endpoint with API key authentication, use the `Security` dependency and pass `api_key_auth` as the first argument.
-You can optionally specify a list of `scopes` that the API key must have.
+In FastAPI you can secure individual endpoints, routers or the whole application with API key authentication.
+
+Use the `Security` dependency and pass the `api_key_auth` function from the Apitally client library as the first argument, as shown in the examples below.
+You can optionally specify a list of `scopes` that the API key must have as well.
 
 If you want to access information about the API key in your endpoint function, add the dependency as an argument to the function instead.
-
-You can also secure the whole application (or a router) by passing the `Security` dependency to the `dependencies` argument of the `FastAPI` (or `Router`) constructor.
 
 <CodeGroup>
 
 ```python Endpoint dependency
 from fastapi import FastAPI, Security
-
 from apitally.fastapi import ApitallyMiddleware, api_key_auth
 
 app = FastAPI()
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
 
-@app.get("/foo", dependencies=[Security(api_key_auth, scopes=["read:foo"]))
-def foo():
-    return "foo"
+@app.get("/items", dependencies=[Security(api_key_auth, scopes=["read:items"]))
+def list_items():
+    return ["item1"]
 ```
 
 ```python Endpoint function argument
 from fastapi import FastAPI, Security
-
 from apitally.fastapi import ApitallyMiddleware, KeyInfo, api_key_auth
 
 app = FastAPI()
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
 
-@app.get("/foo")
-def foo(key: KeyInfo = Security(api_key_auth, scopes=["read:foo"])):
-    return "foo"
+@app.get("/items")
+def list_items(key: KeyInfo = Security(api_key_auth, scopes=["read:items"])):
+    return ["item1"]
+```
+
+```python Router dependency
+from fastapi import FastAPI, Router, Security
+from apitally.fastapi import ApitallyMiddleware, api_key_auth
+
+app = FastAPI()
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+
+router = Router(dependencies=[Security(api_key_auth)])
+app.include_router(router, prefix="/secure")
+
+@router.get("/items")
+def list_items():
+    return ["item1"]
 ```
 
 ```python App dependency
 from fastapi import FastAPI, Security
-
 from apitally.fastapi import ApitallyMiddleware, api_key_auth
 
 app = FastAPI(dependencies=[Security(api_key_auth)]
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
 
-@app.get("/foo")
-def foo():
-    return "foo"
+@app.get("/items")
+def list_items():
+    return ["item1"]
 ```
 
 </CodeGroup>

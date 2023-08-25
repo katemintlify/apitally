@@ -1,0 +1,24 @@
+---
+title: "FAQs"
+description: "Answers to some frequently asked questions."
+---
+
+#### What data is being collected by Apitally?
+
+Only metadata, such as the HTTP method, path, and response status code, is
+collected. The request body and response body are never collected. Our client libraries are
+open-source, so you can verify this for yourself.
+
+#### Where are my API keys stored?
+
+Your API keys are never stored by Apitally or synchronized with your
+application. Instead, [secure hashes](https://en.wikipedia.org/wiki/Scrypt)
+are used to verify if a client-provided API key is valid.
+
+#### Can Apitally replace an APM solution?
+
+No. Apitally is not a replacement for an APM solution.
+
+#### I'm using a framework that currently isn't supported. Will you add support for it?
+
+We're happy to consider it. Please reach out to discuss your use case.
