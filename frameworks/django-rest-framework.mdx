@@ -55,10 +55,11 @@ APITALLY_MIDDLEWARE = {
   <Snippet file="api-key-sync-info.mdx" />
 </div>
 
-To secure your API views with API key authentication use the `HasAPIKey` permission class.
-To specify required scopes, add the `required_scopes` attribute to your `APIView` class, or use the `@required_scopes` decorator if you use function-based views.
+To secure your API views with API key authentication use the `HasAPIKey` permission class or
+the `HasAPIKeyWithScopes` permission class factory, if you need to specify required scopes.
 
 You can access information about the API key in your endpoint function via the `request.auth` object.
+This can be useful if you need to check scopes dynamically, for example.
 
 <CodeGroup>
 
@@ -70,7 +71,19 @@ from apitally.django_rest_framework import HasAPIKey
 
 class ListItemsView(APIView):
     permission_classes = [HasAPIKey]
-    required_scopes = ["read:items"]  # Optional
+
+    def get(self, request: Request) -> Response:
+        return Response(["item1"])
+```
+
+```python Class-based view with scopes
+from rest_framework.views import APIView
+from rest_framework.request import Request
+from rest_framework.response import Response
+from apitally.django_rest_framework import HasAPIKeyWithScopes
+
+class ListItemsView(APIView):
+    permission_classes = [HasAPIKeyWithScopes(["read:items"])]
 
     def get(self, request: Request) -> Response:
         return Response(["item1"])
@@ -80,29 +93,27 @@ class ListItemsView(APIView):
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
-from apitally.django_rest_framework import HasAPIKey, required_scopes
+from apitally.django_rest_framework import HasAPIKeyWithScopes
 
 @api_view()
-@permission_classes([HasAPIKey])
-@required_scopes(["read:items"])  # Optional
+@permission_classes([HasAPIKeyWithScopes(["read:items"])])
 def list_items(self, request: Request) -> Response:
     return Response(["item1"])
 ```
 
 ```python Access key info
-from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 from apitally.django_rest_framework import HasAPIKey
 
-class ListItemsView(APIView):
-    permission_classes = [HasAPIKey]
-    required_scopes = ["read:items"]
-
-    def get(self, request: Request) -> Response:
-        print("Key name:", request.auth.name)
-        print("Key scopes:", request.auth.scopes)
-        return Response(["item1"])
+@api_view()
+@permission_classes([HasAPIKey])
+def list_items(self, request: Request) -> Response:
+    assert request.auth.check_scopes(["read:items"])
+    print("Key name:", request.auth.name)
+    print("Key scopes:", request.auth.scopes)
+    return Response(["item1"])
 ```
 
 </CodeGroup>

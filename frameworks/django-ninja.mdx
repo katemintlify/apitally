@@ -54,6 +54,7 @@ To secure your endpoints with API key authentication provide `APIKeyAuth` object
 Use the optional `scopes` argument to specify required scopes.
 
 You can access information about the API key in your endpoint function via the `request.auth` object.
+This can be useful if you need to check scopes dynamically, for example.
 
 <CodeGroup>
 
@@ -75,8 +76,9 @@ from apitally.django_ninja import APIKeyAuth
 
 api = NinjaAPI()
 
-@api.get("/items", auth=APIKeyAuth(scopes=["read:items"]))
+@api.get("/items", auth=APIKeyAuth())
 def list_items(request: HttpRequest) -> List[str]:
+    assert request.auth.check_scopes(["read:items"])  # type: ignore
     print("Key name:", request.auth.name)  # type: ignore
     print("Key scopes:", request.auth.scopes)  # type: ignore
     return ["item1"]

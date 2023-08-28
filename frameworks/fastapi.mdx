@@ -69,6 +69,7 @@ Use the `Security` dependency and pass the `api_key_auth` function as the first 
 You can optionally specify a list of `scopes` that the API key must have.
 
 If you want to access information about the API key in your endpoint function, add the dependency as an argument to the function instead.
+This can be useful if you need to check scopes dynamically, for example.
 
 <CodeGroup>
 
@@ -92,7 +93,8 @@ app = FastAPI()
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
 
 @app.get("/items")
-def list_items(key: KeyInfo = Security(api_key_auth, scopes=["read:items"])):
+def list_items(key: KeyInfo = Security(api_key_auth)):
+    assert key.check_scopes(["read:items"])
     print("Key name:", key.name)
     print("Key scopes:", key.scopes)
     return ["item1"]

@@ -72,6 +72,7 @@ Use the `@require_api_key` decorator on your Flask route functions to secure the
 and add the optional `scopes` argument to specify required scopes.
 
 You can access information about the API key in your endpoint function via the `g.key_info` object.
+This can be useful if you need to check scopes dynamically, for example.
 
 <CodeGroup>
 
@@ -106,8 +107,9 @@ app.wsgi_app = ApitallyMiddleware(
 )
 
 @app.route("/items")
-@require_api_key(scopes=["read:items"])
+@require_api_key()
 def list_items():
+    assert g.key_info.check_scopes(["read:items"])
     print("Key name:", g.key_info.name)
     print("Key scopes:", g.key_info.scopes)
     return ["item1"]

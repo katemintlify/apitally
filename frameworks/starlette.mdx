@@ -68,7 +68,7 @@ and then use the [`@requires`](https://www.starlette.io/authentication/#permissi
 Always include the `authenticated` scope and optionally any other required scopes.
 
 You can access information about the API key in your endpoint function via the [`request.user`](https://www.starlette.io/authentication/#users) and
-[`request.auth`](https://www.starlette.io/authentication/#authcredentials) objects.
+[`request.auth`](https://www.starlette.io/authentication/#authcredentials) objects. This can be useful if you need to check scopes dynamically, for example.
 
 <CodeGroup>
 
@@ -98,9 +98,10 @@ from starlette.requests import Request
 from starlette.routing import Route
 from apitally.starlette import ApitallyMiddleware, APIKeyBackend
 
-@requires(["authenticated", "read:items"])
+@requires(["authenticated"])
 def list_items(request: Request):
     assert request.user.is_authenticated
+    assert request.auth.check_scopes(["read:items"])
     print("Key name:", request.user.display_name)
     print("Key scopes:", request.auth.scopes)
     return ["item1"]
