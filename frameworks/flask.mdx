@@ -8,16 +8,111 @@ description: "A lightweight WSGI web application framework."
   [FastAPI](https://fastapi.tiangolo.com/) instead.
 </Tip>
 
-## Basic setup
+## Add middleware
 
-...
+To get started, create a new app in Apitally and select Flask as your framework.
 
-## Using keys
+Install the [Apitally Python client](https://pypi.org/project/apitally/) in your Starlette project (e.g. using `pip` or `poetry`) with the `flask` extra.
 
-### Without scopes
+<CodeGroup>
+```shell pip
+pip install apitally[flask]
+```
 
-...
+```toml poetry (pyproject.toml)
+[tool.poetry.dependencies]
+apitally = { version = "*", extras = ["flask"] }
+```
 
-### With scopes
+</CodeGroup>
 
-...
+Add the Apitally middleware to your Flask application and provide the `client_id` for your app.
+The `client_id` is displayed in Apitally immediately after creating the app or on the _Setup instructions_ page for your app.
+
+You can use the optional `env` argument to provide a name for the current environment, otherwise _default_ will be used.
+New environments will be visible in Apitally as soon as data is received from them. You can mark environments as production or non-production on the _Manage environments_ screen.
+
+```python
+from flask import Flask
+from apitally.flask import ApitallyMiddleware
+
+app = Flask(__name__)
+app.wsgi_app = ApitallyMiddleware(
+    app.wsgi_app,
+    client_id="your-client-id",
+    env="your-env-name",
+)
+```
+
+<div className="-mt-4">
+  <Note>
+    If you're also using other middlewares, put the `ApitallyMiddleware` last,
+    so that it wraps the existing stack of middlewares.
+  </Note>
+</div>
+
+## Configure API key auth
+
+Enable the synchronization of API key hashes from Apitally to your application by setting the `enable_keys` argument to `True` when adding the middleware.
+
+```python
+app.wsgi_app = ApitallyMiddleware(
+    app.wsgi_app,
+    client_id="your-client-id",
+    env="your-env-name",
+    enable_keys=True,  # <--
+)
+```
+
+<div className="-mt-4">
+  <Snippet file="api-key-sync-info.mdx" />
+</div>
+
+Use the `@require_api_key` decorator on your Flask route functions to secure them with API key authentication
+and add the optional `scopes` argument to specify required scopes.
+
+You can access information about the API key in your endpoint function via the `g.key_info` object.
+
+<CodeGroup>
+
+```python Authentication
+from flask import Flask
+from apitally.flask import ApitallyMiddleware, require_api_key
+
+app = Flask(__name__)
+app.wsgi_app = ApitallyMiddleware(
+    app.wsgi_app,
+    client_id="your-client-id",
+    env="your-env-name",
+    enable_keys=True,
+)
+
+@app.route("/items")
+@require_api_key(scopes=["read:items"])
+def list_items():
+    return ["item1"]
+```
+
+```python Access key info
+from flask import Flask, g
+from apitally.flask import ApitallyMiddleware, require_api_key
+
+app = Flask(__name__)
+app.wsgi_app = ApitallyMiddleware(
+    app.wsgi_app,
+    client_id="your-client-id",
+    env="your-env-name",
+    enable_keys=True,
+)
+
+@app.route("/items")
+@require_api_key(scopes=["read:items"])
+def list_items():
+    print("Key name:", g.key_info.name)
+    print("Key scopes:", g.key_info.scopes)
+    return ["item1"]
+```
+
+</CodeGroup>
+
+<Snippet file="use-api-keys.mdx" />

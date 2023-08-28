@@ -1,0 +1,20 @@
+## Use API keys
+
+To authenticate requests to your API, clients must provide an API key in the `Authorization` header using the `ApiKey` scheme prefix.
+
+<CodeGroup>
+
+```shell curl
+curl -H "Authorization: ApiKey your-api-key" https://api.your-company.com/items
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.your-company.com/items",
+    headers={"Authorization": "ApiKey your-api-key"},
+)
+```
+
+</CodeGroup>

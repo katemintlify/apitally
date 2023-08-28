@@ -3,11 +3,11 @@ title: "Starlette"
 description: "The little ASGI framework that shines."
 ---
 
-## Basic setup
+## Add middleware
 
 To get started, create a new app in Apitally and select Starlette as your framework.
 
-Install the [Apitally Python client](https://pypi.org/project/apitally/) in your FastAPI project (e.g. using `pip` or `poetry`) with the `starlette` extra.
+Install the [Apitally Python client](https://pypi.org/project/apitally/) in your Starlette project (e.g. using `pip` or `poetry`) with the `starlette` extra.
 
 <CodeGroup>
 ```shell pip
@@ -24,17 +24,10 @@ apitally = { version = "*", extras = ["starlette"] }
 Add the Apitally middleware to your Starlette application and provide the `client_id` for your app.
 The `client_id` is displayed in Apitally immediately after creating the app or on the _Setup instructions_ page for your app.
 
-<CodeGroup>
+You can use the optional `env` argument to provide a name for the current environment, otherwise _default_ will be used.
+New environments will be visible in Apitally as soon as data is received from them. You can mark environments as production or non-production on the _Manage environments_ screen.
 
-```python Default env
-from starlette.applications import Starlette
-from apitally.starlette import ApitallyMiddleware
-
-app = Starlette(routes=[...])
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id")
-```
-
-```python Custom env
+```python
 from starlette.applications import Starlette
 from apitally.starlette import ApitallyMiddleware
 
@@ -46,20 +39,14 @@ app.add_middleware(
 )
 ```
 
-</CodeGroup>
-
-<div className="mt-5">
+<div className="-mt-4">
   <Note>
-    If you're also using other middlewares, put the `ApitallyMiddleware` first,
+    If you're also using other middlewares, put the `ApitallyMiddleware` last,
     so that it wraps the existing stack of middlewares.
   </Note>
 </div>
 
-If you have multiple environments for your application, provide the name of the current environment using the `env` argument (use alphanumeric characters and hyphens only).
-
-New environments will be visible in Apitally as soon as data is received from them. You can mark environments as production or non-production on the _Manage environments_ screen.
-
-## Using API key authentication
+## Configure API key auth
 
 Enable the synchronization of API key hashes from Apitally to your application by setting the `enable_keys` argument to `True` when adding the middleware.
 
@@ -73,13 +60,10 @@ app.add_middleware(
 ```
 
 <div className="-mt-4">
-  <Info>
-    The synchronization happens once at application startup and then every 60
-    seconds.
-  </Info>
+  <Snippet file="api-key-sync-info.mdx" />
 </div>
 
-Add Starlette's [`AuthenticationMiddleware`](https://www.starlette.io/authentication/) with the `ApitallyKeysBackend` to your app,
+Add Starlette's [`AuthenticationMiddleware`](https://www.starlette.io/authentication/) with the `APIKeyBackend` to your app,
 and then use the [`@requires`](https://www.starlette.io/authentication/#permissions) decorator to secure your endpoints with API authentication.
 Always include the `authenticated` scope and optionally any other required scopes.
 
@@ -88,30 +72,11 @@ You can access information about the API key in your endpoint function via the [
 
 <CodeGroup>
 
-```python Basic
+```python Authentication
 from starlette.authentication import requires
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route
-from apitally.starlette import ApitallyMiddleware, ApitallyKeysBackend
-
-@requires("authenticated")
-def list_items():
-    return ["item1"]
-
-routes = [
-    Route("/items", list_items, methods=["GET"]),
-]
-
-app = Starlette(routes=routes)
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
-app.add_middleware(AuthenticationMiddleware, backend=ApitallyKeysBackend())
-```
-
-```python With scopes
-from starlette.authentication import requires
-from starlette.middleware.authentication import AuthenticationMiddleware
-from starlette.routing import Route
-from apitally.starlette import ApitallyMiddleware, ApitallyKeysBackend
+from apitally.starlette import ApitallyMiddleware, APIKeyBackend
 
 @requires(["authenticated", "read:items"])
 def list_items():
@@ -123,7 +88,7 @@ routes = [
 
 app = Starlette(routes=routes)
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
-app.add_middleware(AuthenticationMiddleware, backend=ApitallyKeysBackend())
+app.add_middleware(AuthenticationMiddleware, backend=APIKeyBackend())
 ```
 
 ```python Access key info
@@ -131,12 +96,11 @@ from starlette.authentication import requires
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import Request
 from starlette.routing import Route
-from apitally.starlette import ApitallyMiddleware, ApitallyKeysBackend
+from apitally.starlette import ApitallyMiddleware, APIKeyBackend
 
 @requires(["authenticated", "read:items"])
 def list_items(request: Request):
     assert request.user.is_authenticated
-    print("Key ID:", int(request.user.identity))
     print("Key name:", request.user.display_name)
     print("Key scopes:", request.auth.scopes)
     return ["item1"]
@@ -147,7 +111,9 @@ routes = [
 
 app = Starlette(routes=routes)
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
-app.add_middleware(AuthenticationMiddleware, backend=ApitallyKeysBackend())
+app.add_middleware(AuthenticationMiddleware, backend=APIKeyBackend())
 ```
 
 </CodeGroup>
+
+<Snippet file="use-api-keys.mdx" />

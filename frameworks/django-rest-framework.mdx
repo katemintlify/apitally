@@ -8,16 +8,103 @@ description: "A powerful and flexible toolkit for building Web APIs."
   Ninja](https://django-ninja.rest-framework.com/) instead.
 </Tip>
 
-## Basic setup
+## Add middleware
 
-...
+To get started, create a new app in Apitally and select Django REST Framework as your framework.
 
-## Using keys
+Install the [Apitally Python client](https://pypi.org/project/apitally/) in your Django project (e.g. using `pip` or `poetry`) with the `django_rest_framework` extra.
 
-### Without scopes
+<CodeGroup>
+```shell pip
+pip install apitally[django_rest_framework]
+```
 
-...
+```toml poetry (pyproject.toml)
+[tool.poetry.dependencies]
+apitally = { version = "*", extras = ["django_rest_framework"] }
+```
 
-### With scopes
+</CodeGroup>
 
-...
+<Snippet file="configure-django-middleware.mdx" />
+
+```python
+MIDDLEWARE = [
+    # Other middlewares first ...
+    "apitally.django_rest_framework.ApitallyMiddleware",
+]
+APITALLY_MIDDLEWARE = {
+    "client_id": "your-client-id",
+    "env": "your-env-name",
+}
+```
+
+## Configure API key auth
+
+Enable the synchronization of API key hashes from Apitally to your application by setting `enable_keys` to `True` in the middleware settings.
+
+```python
+APITALLY_MIDDLEWARE = {
+    "client_id": "your-client-id",
+    "env": "your-env-name",
+    "enable_keys": True,  # <--
+}
+```
+
+<div className="-mt-4">
+  <Snippet file="api-key-sync-info.mdx" />
+</div>
+
+To secure your API views with API key authentication use the `HasAPIKey` permission class.
+To specify required scopes, add the `required_scopes` attribute to your `APIView` class, or use the `@required_scopes` decorator if you use function-based views.
+
+You can access information about the API key in your endpoint function via the `request.auth` object.
+
+<CodeGroup>
+
+```python Class-based view
+from rest_framework.views import APIView
+from rest_framework.request import Request
+from rest_framework.response import Response
+from apitally.django_rest_framework import HasAPIKey
+
+class ListItemsView(APIView):
+    permission_classes = [HasAPIKey]
+    required_scopes = ["read:items"]  # Optional
+
+    def get(self, request: Request) -> Response:
+        return Response(["item1"])
+```
+
+```python Function-based view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.request import Request
+from rest_framework.response import Response
+from apitally.django_rest_framework import HasAPIKey, required_scopes
+
+@api_view()
+@permission_classes([HasAPIKey])
+@required_scopes(["read:items"])  # Optional
+def list_items(self, request: Request) -> Response:
+    return Response(["item1"])
+```
+
+```python Access key info
+from rest_framework.views import APIView
+from rest_framework.request import Request
+from rest_framework.response import Response
+from apitally.django_rest_framework import HasAPIKey
+
+class ListItemsView(APIView):
+    permission_classes = [HasAPIKey]
+    required_scopes = ["read:items"]
+
+    def get(self, request: Request) -> Response:
+        print("Key name:", request.auth.name)
+        print("Key scopes:", request.auth.scopes)
+        return Response(["item1"])
+```
+
+</CodeGroup>
+
+<Snippet file="use-api-keys.mdx" />
