@@ -118,4 +118,14 @@ def list_items(self, request: Request) -> Response:
 
 </CodeGroup>
 
+### Custom header
+
+While it is recommended to use the standard `Authorization` header for API key authentication,
+you can configure your application to accept a custom header instead.
+Simply set `APITALLY_CUSTOM_API_KEY_HEADER` in your Django settings file.
+
+```python
+APITALLY_CUSTOM_API_KEY_HEADER = "ApiKey"
+```
+
 <Snippet file="use-api-keys.mdx" />

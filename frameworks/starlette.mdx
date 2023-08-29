@@ -63,7 +63,7 @@ app.add_middleware(
   <Snippet file="api-key-sync-info.mdx" />
 </div>
 
-Add Starlette's [`AuthenticationMiddleware`](https://www.starlette.io/authentication/) with the `APIKeyBackend` to your app,
+Add Starlette's [`AuthenticationMiddleware`](https://www.starlette.io/authentication/) with the `APIKeyAuth` to your app,
 and then use the [`@requires`](https://www.starlette.io/authentication/#permissions) decorator to secure your endpoints with API authentication.
 Always include the `authenticated` scope and optionally any other required scopes.
 
@@ -76,7 +76,7 @@ You can access information about the API key in your endpoint function via the [
 from starlette.authentication import requires
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route
-from apitally.starlette import ApitallyMiddleware, APIKeyBackend
+from apitally.starlette import ApitallyMiddleware, APIKeyAuth
 
 @requires(["authenticated", "read:items"])
 def list_items():
@@ -88,7 +88,7 @@ routes = [
 
 app = Starlette(routes=routes)
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
-app.add_middleware(AuthenticationMiddleware, backend=APIKeyBackend())
+app.add_middleware(AuthenticationMiddleware, backend=APIKeyAuth())
 ```
 
 ```python Access key info
@@ -96,7 +96,7 @@ from starlette.authentication import requires
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import Request
 from starlette.routing import Route
-from apitally.starlette import ApitallyMiddleware, APIKeyBackend
+from apitally.starlette import ApitallyMiddleware, APIKeyAuth
 
 @requires(["authenticated"])
 def list_items(request: Request):
@@ -112,9 +112,34 @@ routes = [
 
 app = Starlette(routes=routes)
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
-app.add_middleware(AuthenticationMiddleware, backend=APIKeyBackend())
+app.add_middleware(AuthenticationMiddleware, backend=APIKeyAuth())
 ```
 
 </CodeGroup>
+
+By default, Starlette returns a `400 Bad Request` response when users provide an invalid API key.
+You can customize this behavior by providing your own `on_error` callback to the authentication middleware.
+
+```python
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse, Response
+from starlette.status import HTTP_403_FORBIDDEN
+
+def on_auth_error(request: Request, exc: Exception) -> Response:
+    return PlainTextResponse(str(exc), status_code=HTTP_403_FORBIDDEN)
+
+app.add_middleware(AuthenticationMiddleware, backend=APIKeyAuth(), on_error=on_auth_error)
+```
+
+### Custom header
+
+While it is recommended to use the standard `Authorization` header for API key authentication,
+you can configure your application to accept a custom header instead.
+Simply provide the `custom_header` argument to the `APIKeyAuth` backend before adding the authentication middleware.
+
+```python
+auth_backend = APIKeyAuth(custom_header="ApiKey")
+app.add_middleware(AuthenticationMiddleware, backend=auth_backend)
+```
 
 <Snippet file="use-api-keys.mdx" />

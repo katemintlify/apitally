@@ -25,7 +25,8 @@ Add the Apitally middleware to your FastAPI application and provide the `client_
 The `client_id` is displayed in Apitally immediately after creating the app or on the _Setup instructions_ page for your app.
 
 You can use the optional `env` argument to provide a name for the current environment, otherwise _default_ will be used.
-New environments will be visible in Apitally as soon as data is received from them. You can mark environments as production or non-production on the _Manage environments_ screen.
+New environments will be visible in Apitally as soon as data is received from them.
+You can mark environments as production or non-production on the _Manage environments_ screen.
 
 ```python
 from fastapi import FastAPI
@@ -80,8 +81,8 @@ from apitally.fastapi import ApitallyMiddleware, api_key_auth
 app = FastAPI()
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
 
-@app.get("/items", dependencies=[Security(api_key_auth, scopes=["read:items"]))
-def list_items():
+@app.get("/items", dependencies=[Security(api_key_auth, scopes=["read:items"])])
+def list_items() -> list[str]:
     return ["item1"]
 ```
 
@@ -93,10 +94,10 @@ app = FastAPI()
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
 
 @app.get("/items")
-def list_items(key: KeyInfo = Security(api_key_auth)):
-    assert key.check_scopes(["read:items"])
-    print("Key name:", key.name)
-    print("Key scopes:", key.scopes)
+def list_items(key_info: KeyInfo = Security(api_key_auth)) -> list[str]:
+    assert key_info.check_scopes(["read:items"])
+    print("Key name:", key_info.name)
+    print("Key scopes:", key_info.scopes)
     return ["item1"]
 ```
 
@@ -111,7 +112,7 @@ router = Router(dependencies=[Security(api_key_auth)])
 app.include_router(router, prefix="/secure")
 
 @router.get("/items")
-def list_items():
+def list_items() -> list[str]:
     return ["item1"]
 ```
 
@@ -119,14 +120,35 @@ def list_items():
 from fastapi import FastAPI, Security
 from apitally.fastapi import ApitallyMiddleware, api_key_auth
 
-app = FastAPI(dependencies=[Security(api_key_auth)]
+app = FastAPI(dependencies=[Security(api_key_auth)])
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
 
 @app.get("/items")
-def list_items():
+def list_items() -> list[str]:
     return ["item1"]
 ```
 
 </CodeGroup>
+
+### Custom header
+
+While it is recommended to use the standard `Authorization` header for API key authentication,
+you can configure your application to accept a custom header instead.
+Simply create your own instance of `APIKeyAuth` and pass in the `custom_header` argument.
+
+```python
+from fastapi import FastAPI, Security
+from apitally.fastapi import ApitallyMiddleware, APIKeyAuth
+
+app = FastAPI()
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+
+# Use a custom header for API key authentication
+api_key_auth = APIKeyAuth(custom_header="ApiKey")
+
+@app.get("/items", dependencies=[Security(api_key_auth, scopes=["read:items"])])
+def list_items() -> list[str]:
+    return ["item1"]
+```
 
 <Snippet file="use-api-keys.mdx" />
