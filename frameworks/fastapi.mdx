@@ -49,14 +49,14 @@ app.add_middleware(
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting the `enable_keys` argument to `True` when adding the middleware.
+Enable the synchronization of API key hashes from Apitally to your application by setting the `sync_api_keys` argument to `True` when adding the middleware.
 
 ```python
 app.add_middleware(
     ApitallyMiddleware,
     client_id="your-client-id",
     env="your-env-name",
-    enable_keys=True,  # <--
+    sync_api_keys=True,  # <--
 )
 ```
 
@@ -79,7 +79,7 @@ from fastapi import FastAPI, Security
 from apitally.fastapi import ApitallyMiddleware, api_key_auth
 
 app = FastAPI()
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", sync_api_keys=True)
 
 @app.get("/items", dependencies=[Security(api_key_auth, scopes=["read:items"])])
 def list_items() -> list[str]:
@@ -91,7 +91,7 @@ from fastapi import FastAPI, Security
 from apitally.fastapi import ApitallyMiddleware, KeyInfo, api_key_auth
 
 app = FastAPI()
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", sync_api_keys=True)
 
 @app.get("/items")
 def list_items(key_info: KeyInfo = Security(api_key_auth)) -> list[str]:
@@ -106,7 +106,7 @@ from fastapi import FastAPI, Router, Security
 from apitally.fastapi import ApitallyMiddleware, api_key_auth
 
 app = FastAPI()
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", sync_api_keys=True)
 
 router = Router(dependencies=[Security(api_key_auth)])
 app.include_router(router, prefix="/secure")
@@ -116,12 +116,12 @@ def list_items() -> list[str]:
     return ["item1"]
 ```
 
-```python App dependency
+```python Global dependency
 from fastapi import FastAPI, Security
 from apitally.fastapi import ApitallyMiddleware, api_key_auth
 
 app = FastAPI(dependencies=[Security(api_key_auth)])
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", sync_api_keys=True)
 
 @app.get("/items")
 def list_items() -> list[str]:
@@ -141,7 +141,7 @@ from fastapi import FastAPI, Security
 from apitally.fastapi import ApitallyMiddleware, APIKeyAuth
 
 app = FastAPI()
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", sync_api_keys=True)
 
 # Use a custom header for API key authentication
 api_key_auth = APIKeyAuth(custom_header="ApiKey")

@@ -41,13 +41,13 @@ APITALLY_MIDDLEWARE = {
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting `enable_keys` to `True` in the middleware settings.
+Enable the synchronization of API key hashes from Apitally to your application by setting `sync_api_keys` to `True` in the middleware settings.
 
 ```python
 APITALLY_MIDDLEWARE = {
     "client_id": "your-client-id",
     "env": "your-env-name",
-    "enable_keys": True,  # <--
+    "sync_api_keys": True,  # <--
 }
 ```
 

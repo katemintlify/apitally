@@ -53,14 +53,14 @@ app.wsgi_app = ApitallyMiddleware(
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting the `enable_keys` argument to `True` when adding the middleware.
+Enable the synchronization of API key hashes from Apitally to your application by setting the `sync_api_keys` argument to `True` when adding the middleware.
 
 ```python
 app.wsgi_app = ApitallyMiddleware(
     app.wsgi_app,
     client_id="your-client-id",
     env="your-env-name",
-    enable_keys=True,  # <--
+    sync_api_keys=True,  # <--
 )
 ```
 
@@ -85,7 +85,7 @@ app.wsgi_app = ApitallyMiddleware(
     app.wsgi_app,
     client_id="your-client-id",
     env="your-env-name",
-    enable_keys=True,
+    sync_api_keys=True,
 )
 
 @app.route("/items")
@@ -103,7 +103,7 @@ app.wsgi_app = ApitallyMiddleware(
     app.wsgi_app,
     client_id="your-client-id",
     env="your-env-name",
-    enable_keys=True,
+    sync_api_keys=True,
 )
 
 @app.route("/items")

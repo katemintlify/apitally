@@ -48,14 +48,14 @@ app.add_middleware(
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting the `enable_keys` argument to `True` when adding the middleware.
+Enable the synchronization of API key hashes from Apitally to your application by setting the `sync_api_keys` argument to `True` when adding the middleware.
 
 ```python
 app.add_middleware(
     ApitallyMiddleware,
     client_id="your-client-id",
     env="your-env-name",
-    enable_keys=True,  # <--
+    sync_api_keys=True,  # <--
 )
 ```
 
@@ -87,7 +87,7 @@ routes = [
 ]
 
 app = Starlette(routes=routes)
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", sync_api_keys=True)
 app.add_middleware(AuthenticationMiddleware, backend=APIKeyAuth())
 ```
 
@@ -111,7 +111,7 @@ routes = [
 ]
 
 app = Starlette(routes=routes)
-app.add_middleware(ApitallyMiddleware, client_id="your-client-id", enable_keys=True)
+app.add_middleware(ApitallyMiddleware, client_id="your-client-id", sync_api_keys=True)
 app.add_middleware(AuthenticationMiddleware, backend=APIKeyAuth())
 ```
 
