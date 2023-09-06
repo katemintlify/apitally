@@ -1,7 +1,16 @@
 ---
 title: "Django Ninja"
-description: "A web framework for building APIs with Django and Python 3.6+ type hints."
 ---
+
+This page guides you through the steps of configuring your Django Ninja application to work with Apitally. If you don't have an account yet, now would be a good time to [sign up](https://app.apitally.io).
+
+Once you're done with this guide, you will be able to:
+
+- Monitor traffic to your Django Ninja application
+- Keep track of response times and errors
+- Understand how individual consumers use your application
+- Secure your application with API keys that can be easily managed through Apitally
+- Manage scopes to control access to your endpoints
 
 ## Add middleware
 
@@ -33,6 +42,39 @@ APITALLY_MIDDLEWARE = {
     "env": "your-env-name",
 }
 ```
+
+## Identify consumers
+
+<Snippet file="identify-consumers.mdx" />
+
+To associate requests with consumers, provide a <Tooltip tip="See example below">callback function</Tooltip> to the `ApitallyMiddleware` that takes a [`HttpRequest`](https://docs.djangoproject.com/en/4.2/ref/request-response/#httprequest-objects) object as an argument and returns a consumer identifier or `None`.
+
+<Snippet file="consumer-identifier.mdx" />
+
+<CodeGroup>
+
+```python Callback function definition
+from django.http import HttpRequest
+
+def identify_consumer(request: HttpRequest) -> str | None:
+    if request.user.is_authenticated:
+        return request.user.username
+    return None
+```
+
+```python Middleware settings
+APITALLY_MIDDLEWARE = {
+    "client_id": "your-client-id",
+    "env": "your-env-name",
+    "identify_consumer_callback": "your_project.api.utils.identify_consumer",
+}
+```
+
+</CodeGroup>
+
+<div className="mt-4">
+  <Snippet file="identify-consumers-check.mdx" />
+</div>
 
 ## Configure API key auth
 

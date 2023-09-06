@@ -1,7 +1,16 @@
 ---
 title: "Django REST Framework"
-description: "A powerful and flexible toolkit for building Web APIs."
 ---
+
+This page guides you through the steps of configuring your Django REST Framework application to work with Apitally. If you don't have an account yet, now would be a good time to [sign up](https://app.apitally.io).
+
+Once you're done with this guide, you will be able to:
+
+- Monitor traffic to your Django REST Framework application
+- Keep track of response times and errors
+- Understand how individual consumers use your application
+- Secure your application with API keys that can be easily managed through Apitally
+- Manage scopes to control access to your endpoints
 
 <Tip>
   If you're starting a new project, you might want to consider using [Django
@@ -38,6 +47,39 @@ APITALLY_MIDDLEWARE = {
     "env": "your-env-name",
 }
 ```
+
+## Identify consumers
+
+<Snippet file="identify-consumers.mdx" />
+
+To associate requests with consumers, provide a <Tooltip tip="See example below">callback function</Tooltip> to the `ApitallyMiddleware` that takes a [`HttpRequest`](https://docs.djangoproject.com/en/4.2/ref/request-response/#httprequest-objects) object as an argument and returns a consumer identifier or `None`.
+
+<Snippet file="consumer-identifier.mdx" />
+
+<CodeGroup>
+
+```python Callback function definition
+from django.http import HttpRequest
+
+def identify_consumer(request: HttpRequest) -> str | None:
+    if request.user.is_authenticated:
+        return request.user.username
+    return None
+```
+
+```python Middleware settings
+APITALLY_MIDDLEWARE = {
+    "client_id": "your-client-id",
+    "env": "your-env-name",
+    "identify_consumer_callback": "your_project.api.utils.identify_consumer",
+}
+```
+
+</CodeGroup>
+
+<div className="mt-4">
+  <Snippet file="identify-consumers-check.mdx" />
+</div>
 
 ## Configure API key auth
 
@@ -97,7 +139,7 @@ from apitally.django_rest_framework import HasAPIKeyWithScopes
 
 @api_view()
 @permission_classes([HasAPIKeyWithScopes(["read:items"])])
-def list_items(self, request: Request) -> Response:
+def list_items(request: Request) -> Response:
     return Response(["item1"])
 ```
 
@@ -109,7 +151,7 @@ from apitally.django_rest_framework import HasAPIKey
 
 @api_view()
 @permission_classes([HasAPIKey])
-def list_items(self, request: Request) -> Response:
+def list_items(request: Request) -> Response:
     assert request.auth.check_scopes(["read:items"])
     print("Key name:", request.auth.name)
     print("Key scopes:", request.auth.scopes)

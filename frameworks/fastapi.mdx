@@ -1,7 +1,16 @@
 ---
 title: "FastAPI"
-description: "High performance, easy to learn, fast to code, ready for production."
 ---
+
+This page guides you through the steps of configuring your FastAPI application to work with Apitally. If you don't have an account yet, now would be a good time to [sign up](https://app.apitally.io).
+
+Once you're done with this guide, you will be able to:
+
+- Monitor traffic to your FastAPI application
+- Keep track of response times and errors
+- Understand how individual consumers use your application
+- Secure your application with API keys that are easily managed through Apitally
+- Use scopes to control different levels of access to your endpoints
 
 ## Add middleware
 
@@ -41,10 +50,41 @@ app.add_middleware(
 ```
 
 <div className="-mt-4">
-  <Note>
-    If you're also using other middlewares, put the `ApitallyMiddleware` last,
-    so that it wraps the existing stack of middlewares.
-  </Note>
+  <Snippet file="other-middlewares-note.mdx" />
+</div>
+
+<Snippet file="add-middleware-check.mdx" />
+
+## Identify consumers
+
+<Snippet file="identify-consumers.mdx" />
+
+To associate requests with consumers, set the `consumer_identifier` attribute on the [`request.state`](https://www.starlette.io/requests/#other-state) object. You could do this <Tooltip tip="See example below">in a dependency</Tooltip> or another middleware, for example.
+
+<Snippet file="consumer-identifier.mdx" />
+
+```python
+from typing import Annotated
+from fastapi import FastAPI, Depends
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+class User(BaseModel):
+    username: str
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    user = fake_decode_token(token)
+    return user
+
+def identify_consumer(current_user: Annotated[User, Depends(get_current_user)]):
+    request.state.consumer_identifier = current_user.username
+
+app = FastAPI(dependencies=[Depends(identify_consumer)])
+```
+
+<div className="-mt-4">
+  <Snippet file="identify-consumers-check.mdx" />
 </div>
 
 ## Configure API key auth
@@ -87,6 +127,7 @@ def list_items() -> list[str]:
 ```
 
 ```python Endpoint function argument
+from typing import Annotated
 from fastapi import FastAPI, Security
 from apitally.fastapi import ApitallyMiddleware, KeyInfo, api_key_auth
 
@@ -94,7 +135,7 @@ app = FastAPI()
 app.add_middleware(ApitallyMiddleware, client_id="your-client-id", sync_api_keys=True)
 
 @app.get("/items")
-def list_items(key_info: KeyInfo = Security(api_key_auth)) -> list[str]:
+def list_items(key_info: Annotated[KeyInfo, Security(api_key_auth)]) -> list[str]:
     assert key_info.check_scopes(["read:items"])
     print("Key name:", key_info.name)
     print("Key scopes:", key_info.scopes)

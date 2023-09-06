@@ -6,14 +6,14 @@ clients must provide an API key in the `Authorization` header using the `ApiKey`
 <CodeGroup>
 
 ```shell curl
-curl -H "Authorization: ApiKey your-api-key" https://api.your-company.com/items
+curl -H "Authorization: ApiKey your-api-key" https://api.example.com/items
 ```
 
 ```python Python
 import requests
 
 response = requests.get(
-    "https://api.your-company.com/items",
+    "https://api.example.com/items",
     headers={"Authorization": "ApiKey your-api-key"},
 )
 ```

@@ -1,7 +1,16 @@
 ---
 title: "Starlette"
-description: "The little ASGI framework that shines."
 ---
+
+This page guides you through the steps of configuring your Starlette application to work with Apitally. If you don't have an account yet, now would be a good time to [sign up](https://app.apitally.io).
+
+Once you're done with this guide, you will be able to:
+
+- Monitor traffic to your Starlette application
+- Keep track of response times and errors
+- Understand how individual consumers use your application
+- Secure your application with API keys that are easily managed through Apitally
+- Use scopes to control different levels of access to your endpoints
 
 ## Add middleware
 
@@ -40,10 +49,52 @@ app.add_middleware(
 ```
 
 <div className="-mt-4">
-  <Note>
-    If you're also using other middlewares, put the `ApitallyMiddleware` last,
-    so that it wraps the existing stack of middlewares.
-  </Note>
+  <Snippet file="other-middlewares-note.mdx" />
+</div>
+
+<Snippet file="add-middleware-check.mdx" />
+
+## Identify consumers
+
+<Snippet file="identify-consumers.mdx" />
+
+To associate requests with consumers, provide a <Tooltip tip="See example below">callback function</Tooltip> to the `ApitallyMiddleware` that takes a [`Request`](https://www.starlette.io/requests/) object as an argument and returns a consumer identifier or `None`.
+
+Alternatively, you can set the `consumer_identifier` attribute on the [`request.state`](https://www.starlette.io/requests/#other-state) object, for example in another middleware or directly in your endpoint functions.
+
+<Snippet file="consumer-identifier.mdx" />
+
+<CodeGroup>
+
+```python Callback function
+from starlette.requests import Request
+
+def identify_consumer(request: Request) -> str | None:
+    if request.user.is_authenticated:
+        return request.user.identity
+    return None
+
+app.add_middleware(
+    ApitallyMiddleware,
+    client_id="your-client-id",
+    env="your-env-name",
+    identify_consumer_callback=identify_consumer,
+)
+```
+
+```python State object
+from starlette.requests import Request
+
+def list_items(request: Request):
+    if request.user.is_authenticated:
+        request.state.consumer_identifier = request.user.identity
+    return ["item1"]
+```
+
+</CodeGroup>
+
+<div className="mt-4">
+  <Snippet file="identify-consumers-check.mdx" />
 </div>
 
 ## Configure API key auth
@@ -75,11 +126,12 @@ You can access information about the API key in your endpoint function via the [
 ```python Authentication
 from starlette.authentication import requires
 from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.requests import Request
 from starlette.routing import Route
 from apitally.starlette import ApitallyMiddleware, APIKeyAuth
 
 @requires(["authenticated", "read:items"])
-def list_items():
+def list_items(request: Request):
     return ["item1"]
 
 routes = [
