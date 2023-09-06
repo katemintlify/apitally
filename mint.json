@@ -38,14 +38,14 @@
   },
   "anchors": [
     {
+      "name": "Community",
+      "icon": "slack",
+      "url": "https://apitally-users.slack.com"
+    },
+    {
       "name": "GitHub",
       "icon": "github",
       "url": "https://github.com/apitally"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://blog.apitally.io"
     }
   ],
   "navigation": [
@@ -65,7 +65,13 @@
     }
   ],
   "footerSocials": {
-    "twitter": "https://twitter.com/apitally",
-    "github": "https://github.com/apitally"
+    "github": "https://github.com/apitally",
+    "slack": "https://apitally-users.slack.com",
+    "twitter": "https://twitter.com/apitally"
+  },
+  "feedback": {
+    "thumbsRating": false,
+    "suggestEdit": true,
+    "raiseIssue": true
   }
 }
