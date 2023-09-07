@@ -2,7 +2,7 @@
 title: "Django REST Framework"
 ---
 
-This page guides you through the steps of configuring your Django REST Framework application to work with Apitally. If you don't have an account yet, now would be a good time to [sign up](https://app.apitally.io).
+This page guides you through the steps of configuring your Django REST Framework (DRF) application to work with Apitally. If you don't have an account yet, now would be a good time to [sign up](https://app.apitally.io).
 
 Once you're done with this guide, you will be able to:
 
@@ -83,7 +83,8 @@ APITALLY_MIDDLEWARE = {
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting `sync_api_keys` to `True` in the middleware settings.
+To secure your DRF application with API key authentication, you first have to enable synchronization of API key hashes from Apitally to your application.
+Simply set `sync_api_keys` to `True` in the middleware settings.
 
 ```python
 APITALLY_MIDDLEWARE = {
@@ -160,6 +161,10 @@ def list_items(request: Request) -> Response:
 
 </CodeGroup>
 
+<div className="mt-4">
+  <Snippet file="configure-api-key-auth-check.mdx" />
+</div>
+
 ### Custom header
 
 While it is recommended to use the standard `Authorization` header for API key authentication,
@@ -169,5 +174,3 @@ Simply set `APITALLY_CUSTOM_API_KEY_HEADER` in your Django settings file.
 ```python
 APITALLY_CUSTOM_API_KEY_HEADER = "ApiKey"
 ```
-
-<Snippet file="use-api-keys.mdx" />

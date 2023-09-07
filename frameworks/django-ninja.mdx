@@ -78,7 +78,8 @@ APITALLY_MIDDLEWARE = {
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting `sync_api_keys` to `True` in the middleware settings.
+To secure your Django Ninja application with API key authentication, you first have to enable synchronization of API key hashes from Apitally to your application.
+Simply set `sync_api_keys` to `True` in the middleware settings.
 
 ```python
 APITALLY_MIDDLEWARE = {
@@ -128,6 +129,10 @@ def list_items(request: HttpRequest) -> list[str]:
 
 </CodeGroup>
 
+<div className="mt-4">
+  <Snippet file="configure-api-key-auth-check.mdx" />
+</div>
+
 ### Custom header
 
 While it is recommended to use the standard `Authorization` header for API key authentication,
@@ -144,5 +149,3 @@ class APIKeyAuth(APIKeyAuthBase):
 def list_items() -> list[str]:
     return ["item1"]
 ```
-
-<Snippet file="use-api-keys.mdx" />

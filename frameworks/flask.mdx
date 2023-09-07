@@ -80,7 +80,8 @@ def identify_consumer():
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting the `sync_api_keys` argument to `True` when adding the middleware.
+To secure your Flask application with API key authentication, you first have to enable synchronization of API key hashes from Apitally to your application.
+Simply set the `sync_api_keys` argument to `True` when adding the middleware.
 
 ```python
 app.wsgi_app = ApitallyMiddleware(
@@ -144,6 +145,10 @@ def list_items():
 
 </CodeGroup>
 
+<div className="mt-4">
+  <Snippet file="configure-api-key-auth-check.mdx" />
+</div>
+
 ### Custom header
 
 While it is recommended to use the standard `Authorization` header for API key authentication,
@@ -175,5 +180,3 @@ def list_items():
 ```
 
 </CodeGroup>
-
-<Snippet file="use-api-keys.mdx" />

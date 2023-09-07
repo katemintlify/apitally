@@ -89,7 +89,8 @@ app = FastAPI(dependencies=[Depends(identify_consumer)])
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting the `sync_api_keys` argument to `True` when adding the middleware.
+To secure your FastAPI application with API key authentication, you first have to enable synchronization of API key hashes from Apitally to your application.
+Simply set the `sync_api_keys` argument to `True` when adding the middleware.
 
 ```python
 app.add_middleware(
@@ -104,9 +105,7 @@ app.add_middleware(
   <Snippet file="api-key-sync-info.mdx" />
 </div>
 
-In FastAPI you can easily secure individual endpoints, routers or the whole application with API key authentication.
-
-Use the `Security` dependency and pass the `api_key_auth` function as the first argument.
+In FastAPI you can easily secure individual endpoints, routers or the whole application by injecting the built-in `Security` dependency and passing the `api_key_auth` function as the first argument.
 You can optionally specify a list of `scopes` that the API key must have.
 
 If you want to access information about the API key in your endpoint function, add the dependency as an argument to the function instead.
@@ -171,6 +170,10 @@ def list_items() -> list[str]:
 
 </CodeGroup>
 
+<div className="mt-4">
+  <Snippet file="configure-api-key-auth-check.mdx" />
+</div>
+
 ### Custom header
 
 While it is recommended to use the standard `Authorization` header for API key authentication,
@@ -191,5 +194,3 @@ api_key_auth = APIKeyAuth(custom_header="ApiKey")
 def list_items() -> list[str]:
     return ["item1"]
 ```
-
-<Snippet file="use-api-keys.mdx" />

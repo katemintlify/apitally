@@ -40,12 +40,17 @@
     {
       "name": "Community",
       "icon": "slack",
-      "url": "https://apitally-users.slack.com"
+      "url": "https://apitally-community.slack.com"
     },
     {
       "name": "GitHub",
       "icon": "github",
       "url": "https://github.com/apitally"
+    },
+    {
+      "name": "Blog",
+      "icon": "newspaper",
+      "url": "https://apitally.medium.com"
     }
   ],
   "navigation": [
@@ -66,7 +71,7 @@
   ],
   "footerSocials": {
     "github": "https://github.com/apitally",
-    "slack": "https://apitally-users.slack.com",
+    "slack": "https://apitally-community.slack.com",
     "twitter": "https://twitter.com/apitally"
   },
   "feedback": {

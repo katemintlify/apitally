@@ -99,7 +99,8 @@ def list_items(request: Request):
 
 ## Configure API key auth
 
-Enable the synchronization of API key hashes from Apitally to your application by setting the `sync_api_keys` argument to `True` when adding the middleware.
+To secure your Starlette application with API key authentication, you first have to enable synchronization of API key hashes from Apitally to your application.
+Simply set the `sync_api_keys` argument to `True` when adding the middleware.
 
 ```python
 app.add_middleware(
@@ -114,8 +115,8 @@ app.add_middleware(
   <Snippet file="api-key-sync-info.mdx" />
 </div>
 
-Add Starlette's [`AuthenticationMiddleware`](https://www.starlette.io/authentication/) with the `APIKeyAuth` to your app,
-and then use the [`@requires`](https://www.starlette.io/authentication/#permissions) decorator to secure your endpoints with API authentication.
+Add Starlette's [`AuthenticationMiddleware`](https://www.starlette.io/authentication/) with the `APIKeyAuth` backend to your app,
+and then use the [`@requires`](https://www.starlette.io/authentication/#permissions) decorator to secure your endpoints.
 Always include the `authenticated` scope and optionally any other required scopes.
 
 You can access information about the API key in your endpoint function via the [`request.user`](https://www.starlette.io/authentication/#users) and
@@ -183,6 +184,10 @@ def on_auth_error(request: Request, exc: Exception) -> Response:
 app.add_middleware(AuthenticationMiddleware, backend=APIKeyAuth(), on_error=on_auth_error)
 ```
 
+<div className="-mt-4">
+  <Snippet file="configure-api-key-auth-check.mdx" />
+</div>
+
 ### Custom header
 
 While it is recommended to use the standard `Authorization` header for API key authentication,
@@ -193,5 +198,3 @@ Simply provide the `custom_header` argument to the `APIKeyAuth` backend before a
 auth_backend = APIKeyAuth(custom_header="ApiKey")
 app.add_middleware(AuthenticationMiddleware, backend=auth_backend)
 ```
-
-<Snippet file="use-api-keys.mdx" />
