@@ -5,11 +5,9 @@ description: "Understand what's in the box."
 
 ## API traffic monitoring
 
-![Insights screenshot](/images/insights.webp)
-
 - Monitor your API traffic in near real-time, per consumer, endpoint and across multiple environments
-- Track client and server errors, and quickly understand which endpoints are causing issues for your users
-- Gain insights into validation errors your users are encountering (if supported by your framework)
+- Track client and server errors to quickly understand which endpoints are causing issues for your users
+- Gain insights into validation errors your users are encountering (FastAPI and Django Ninja only)
 - Understand which status codes are being returned by your endpoints
 - Track your endpoints' response times, and identify which ones are performing poorly
 - Aggregate metrics by hour, day, or month, with data retention of up to one year
@@ -21,6 +19,14 @@ description: "Understand what's in the box."
 - Define scopes and assign them to API keys for fine-grained access control to your endpoints
 - Set expiry dates on API keys to automatically revoke access after a period of time
 - Rotate API keys with a configurable grace period to avoid service interruptions
+- Disable API keys to immediately revoke access (and re-enable them later if needed)
 - Track the usage of API keys
+- Import existing API keys
 - Easily set up API key authentication in your application with our client libraries
 - Rest assured that your API keys are never stored by Apitally
+
+## Roadmap
+
+- Support for more REST API frameworks (Spring Boot, Express, etc.)
+- Hosted auto-generated API documentation
+- Alerting
