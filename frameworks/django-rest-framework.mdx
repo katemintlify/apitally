@@ -25,10 +25,14 @@ Install the [Apitally Python client](https://pypi.org/project/apitally/) in your
 
 <CodeGroup>
 ```shell pip
-pip install apitally[django_rest_framework]
+pip install "apitally[django_rest_framework]"
 ```
 
-```toml poetry (pyproject.toml)
+```shell poetry
+poetry add "apitally[django_rest_framework]"
+```
+
+```toml pyproject.toml
 [tool.poetry.dependencies]
 apitally = { version = "*", extras = ["django_rest_framework"] }
 ```
