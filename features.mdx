@@ -3,27 +3,37 @@ title: "Features"
 description: "Understand what's in the box."
 ---
 
+## General
+
+- Support for FastAPI, Starlette, Flask, Django Ninja and Django REST Framework (more soon)
+- Add and manage applications and their different environments
+- View number of active instances of each application per environment
+- Create and switch between different teams
+- Invite team members with owner, admin or read-only permissions
+
 ## API traffic monitoring
 
-- Monitor your API traffic in near real-time, per consumer, endpoint and across multiple environments
-- Track client and server errors to quickly understand which endpoints are causing issues for your users
-- Gain insights into validation errors your users are encountering (FastAPI and Django Ninja only)
-- Understand which status codes are being returned by your endpoints
-- Track your endpoints' response times, and identify which ones are performing poorly
-- Aggregate metrics by hour, day, or month, with data retention of up to one year
-- Automatically detect all endpoints in your application through introspection, even those that haven't been used yet
+- Monitor API traffic in near real-time, per consumer, endpoint and across multiple environments
+- List all endpoints of your application (even those that haven't been used)
+- List consumers of your application with their number of requests and error rates
+- View number of successful and failed requests over time
+- View different percentiles of response times of endpoints
+- View details about validation errors users are encountering (FastAPI and Django Ninja only)
+- Understand which status codes are being returned
+- Filter to different time periods and individual consumers
+- Data retention of up to one year
 
 ## API key management
 
-- Easily create and manage API keys for your users
-- Define scopes and assign them to API keys for fine-grained access control to your endpoints
-- Set expiry dates on API keys to automatically revoke access after a period of time
-- Rotate API keys with a configurable grace period to avoid service interruptions
+- Create and manage API keys for your application
+- Define scopes and assign them to API keys for fine-grained access control
+- Select which environments API keys are valid in
+- Set expiration dates on API keys
+- Rotate API keys with a grace period to avoid service interruptions
 - Disable API keys to immediately revoke access (and re-enable them later if needed)
-- Track the usage of API keys
-- Import existing API keys
+- Track the usage of API keys over time
+- Import existing API keys, optionally with name and expiration date
 - Easily set up API key authentication in your application with our client libraries
-- Rest assured that your API keys are never stored by Apitally
 
 ## Roadmap
 
